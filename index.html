@@ -20,7 +20,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kelas</label>
                 <select id="kelas" class="w-full border rounded p-2" required>
-                    <option value="">-- Pilih Kelas --</option>
+                    <option value="">-- Memuat daftar kelas... --</option>
                 </select>
             </div>
         </div>
@@ -54,108 +54,128 @@
     </div>
 
     <script>
-        // --------------------------
-        // KONEKSI KE SUPABASE
-        // --------------------------
+        // ==========================================
+        // 🔑 PASTIKAN GANTI KUNCI INI DENGAN MILIKMU
+        // ==========================================
         const SUPABASE_URL = "https://vbqihpwsneymfrjzlkrw.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_lIrrMLTWNuQ_g0t0BXogp..."; // GANTI dengan kunci lengkap kamu
+        // GANTI bagian ini dengan kunci lengkap yang kamu salin tadi:
+        const SUPABASE_ANON_KEY = "sb_publishable_lIrrMLTWNuQ_g0t0BXogpQ_6x5Vt3lh"; 
         const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --------------------------
-        // AMBIL DAFTAR KELAS DARI DATA SISWA
-        // --------------------------
+        // ==========================================
+        // 📋 AMBIL DAFTAR KELAS DARI TABEL DATA SISWA
+        // ==========================================
         async function ambilDaftarKelas() {
-            const { data, error } = await supabase
-                .from("Data Siswa 2026/2027")
-                .select(`"KELAS"`)
-                .not("KELAS", "is", null)
-                .order("KELAS");
+            try {
+                const { data, error } = await supabase
+                    .from("Data Siswa 2026/2027")
+                    .select("KELAS") // Perbaiki cara baca kolom
+                    .not("KELAS", "is", null)
+                    .order("KELAS", { ascending: true });
 
-            if (error) {
-                console.error("Gagal ambil kelas:", error);
-                alert("Tidak bisa memuat daftar kelas: " + error.message);
-                return;
+                if (error) {
+                    console.error("Error ambil kelas:", error);
+                    document.getElementById("kelas").innerHTML = `<option value="">❌ Gagal memuat kelas</option>`;
+                    return;
+                }
+
+                // Hapus duplikat dan kosong
+                const daftarKelas = [...new Set(data.map(item => item.KELAS))].filter(k => k);
+                const pilih = document.getElementById("kelas");
+                pilih.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+
+                if (daftarKelas.length === 0) {
+                    pilih.innerHTML = `<option value="">⚠️ Belum ada data kelas</option>`;
+                    return;
+                }
+
+                daftarKelas.forEach(kelas => {
+                    const opsi = document.createElement("option");
+                    opsi.value = kelas;
+                    opsi.textContent = kelas;
+                    pilih.appendChild(opsi);
+                });
+
+            } catch (err) {
+                console.error("Kesalahan:", err);
             }
-            
-            const daftarKelas = [...new Set(data.map(item => item.KELAS))].filter(k => k);
-            const pilih = document.getElementById("kelas");
-            pilih.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
-            daftarKelas.forEach(kelas => {
-                const opsi = document.createElement("option");
-                opsi.value = kelas;
-                opsi.textContent = kelas;
-                pilih.appendChild(opsi);
-            });
         }
 
-        // --------------------------
-        // TAMPILKAN DAFTAR SISWA BERDASARKAN KELAS
-        // --------------------------
+        // ==========================================
+        // 👤 TAMPILKAN DAFTAR SISWA SESUAI KELAS
+        // ==========================================
         document.getElementById("muatSiswa").addEventListener("click", async () => {
-            const kelas = document.getElementById("kelas").value;
-            const tanggal = document.getElementById("tanggal").value;
+            const kelas = document.getElementById("kelas").value.trim();
+            const tanggal = document.getElementById("tanggal").value.trim();
 
             if (!tanggal || !kelas) {
-                alert("Isi tanggal dan pilih kelas dulu!");
+                alert("⚠️ Isi tanggal dan pilih kelas terlebih dahulu!");
                 return;
             }
 
-            const { data, error } = await supabase
-                .from("Data Siswa 2026/2027")
-                .select(`"NAMA SISWA"`)
-                .eq("KELAS", kelas)
-                .order("NAMA SISWA");
+            try {
+                const { data, error } = await supabase
+                    .from("Data Siswa 2026/2027")
+                    .select("NAMA SISWA")
+                    .eq("KELAS", kelas)
+                    .order("NAMA SISWA", { ascending: true });
 
-            if (error) {
-                alert("Gagal memuat siswa: " + error.message);
-                return;
+                if (error) {
+                    alert("❌ Gagal memuat siswa: " + error.message);
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    alert("ℹ️ Tidak ada siswa terdaftar di kelas ini");
+                    return;
+                }
+
+                const tabel = document.getElementById("daftarSiswa");
+                tabel.innerHTML = "";
+
+                data.forEach((siswa, i) => {
+                    const baris = document.createElement("tr");
+                    baris.className = "hover:bg-gray-50";
+                    baris.innerHTML = `
+                        <td class="border p-2 text-center">${i + 1}</td>
+                        <td class="border p-2">${siswa["NAMA SISWA"]}</td>
+                        <td class="border p-2 text-center">
+                            <div class="flex justify-center gap-2 flex-wrap">
+                                <label class="cursor-pointer px-2 py-1 rounded bg-green-100 hover:bg-green-200">
+                                    <input type="radio" name="status_${i}" value="H" checked> H
+                                </label>
+                                <label class="cursor-pointer px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200">
+                                    <input type="radio" name="status_${i}" value="S"> S
+                                </label>
+                                <label class="cursor-pointer px-2 py-1 rounded bg-blue-100 hover:bg-blue-200">
+                                    <input type="radio" name="status_${i}" value="I"> I
+                                </label>
+                                <label class="cursor-pointer px-2 py-1 rounded bg-red-100 hover:bg-red-200">
+                                    <input type="radio" name="status_${i}" value="A"> A
+                                </label>
+                                <input type="hidden" class="nama_siswa" value="${siswa["NAMA SISWA"]}">
+                            </div>
+                        </td>
+                    `;
+                    tabel.appendChild(baris);
+                });
+
+                document.getElementById("areaTabel").classList.remove("hidden");
+
+            } catch (err) {
+                alert("❌ Terjadi kesalahan: " + err.message);
             }
-            if (!data.length) {
-                alert("Tidak ada siswa di kelas ini!");
-                return;
-            }
-
-            const tabel = document.getElementById("daftarSiswa");
-            tabel.innerHTML = "";
-
-            data.forEach((siswa, i) => {
-                const baris = document.createElement("tr");
-                baris.className = "hover:bg-gray-50";
-                baris.innerHTML = `
-                    <td class="border p-2 text-center">${i + 1}</td>
-                    <td class="border p-2">${siswa["NAMA SISWA"]}</td>
-                    <td class="border p-2 text-center">
-                        <div class="flex justify-center gap-2">
-                            <label class="cursor-pointer px-2 py-1 rounded bg-green-100 hover:bg-green-200">
-                                <input type="radio" name="status_${i}" value="H" checked> H
-                            </label>
-                            <label class="cursor-pointer px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200">
-                                <input type="radio" name="status_${i}" value="S"> S
-                            </label>
-                            <label class="cursor-pointer px-2 py-1 rounded bg-blue-100 hover:bg-blue-200">
-                                <input type="radio" name="status_${i}" value="I"> I
-                            </label>
-                            <label class="cursor-pointer px-2 py-1 rounded bg-red-100 hover:bg-red-200">
-                                <input type="radio" name="status_${i}" value="A"> A
-                            </label>
-                            <input type="hidden" class="nama_siswa" value="${siswa["NAMA SISWA"]}">
-                        </div>
-                    </td>
-                `;
-                tabel.appendChild(baris);
-            });
-
-            document.getElementById("areaTabel").classList.remove("hidden");
         });
 
-        // --------------------------
-        // SIMPAN DATA KE SUPABASE
-        // --------------------------
+        // ==========================================
+        // 💾 SIMPAN DATA KEHADIRAN KE SUPABASE
+        // ==========================================
         document.getElementById("simpanData").addEventListener("click", async () => {
             const tanggal = document.getElementById("tanggal").value;
             const kelas = document.getElementById("kelas").value;
             const pesan = document.getElementById("pesan");
             pesan.textContent = "";
+            pesan.className = "mt-4 text-center font-medium";
 
             const baris = document.querySelectorAll("#daftarSiswa tr");
             const dataMasuk = [];
@@ -172,21 +192,33 @@
                 });
             });
 
-            const { error } = await supabase
-                .from("presensi_mentah")
-                .insert(dataMasuk);
+            try {
+                const { error } = await supabase
+                    .from("presensi_mentah")
+                    .insert(dataMasuk);
 
-            if (error) {
-                pesan.textContent = "❌ Gagal disimpan: " + error.message;
-                pesan.className = "mt-4 text-center font-medium text-red-600";
-            } else {
-                pesan.textContent = "✅ Berhasil disimpan! Rekap otomatis terbarui.";
-                pesan.className = "mt-4 text-center font-medium text-green-600";
+                if (error) {
+                    pesan.textContent = "❌ Gagal disimpan: " + error.message;
+                    pesan.classList.add("text-red-600");
+                    console.error("Error simpan:", error);
+                } else {
+                    pesan.textContent = "✅ Berhasil disimpan! Rekap otomatis terbarui.";
+                    pesan.classList.add("text-green-600");
+                    // Reset form setelah simpan
+                    setTimeout(() => {
+                        document.getElementById("areaTabel").classList.add("hidden");
+                        document.getElementById("tanggal").value = "";
+                    }, 2000);
+                }
+
+            } catch (err) {
+                pesan.textContent = "❌ Kesalahan sistem: " + err.message;
+                pesan.classList.add("text-red-600");
             }
         });
 
         // Jalankan saat halaman dibuka
-        window.onload = ambilDaftarKelas;
+        window.addEventListener("load", ambilDaftarKelas);
     </script>
 </body>
 </html>
