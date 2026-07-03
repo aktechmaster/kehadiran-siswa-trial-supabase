@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Kehadiran Kelas</title>
+    <title>Jurnal Kehadiran Siswa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -11,7 +11,6 @@
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">📋 Jurnal Kehadiran Siswa</h1>
 
-        
         <!-- Form Pilihan -->
         <div class="grid md:grid-cols-2 gap-4 mb-6">
             <div>
@@ -59,7 +58,7 @@
         // KONEKSI KE SUPABASE
         // --------------------------
         const SUPABASE_URL = "https://vbqihpwsneymfrjzlkrw.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_lIrrMLTWNuQ_g0t0BXogpQ_6x5Vt3lh";
+        const SUPABASE_ANON_KEY = "sb_publishable_lIrrMLTWNuQ_g0t0BXogp..."; // GANTI dengan kunci lengkap kamu
         const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --------------------------
@@ -68,16 +67,20 @@
         async function ambilDaftarKelas() {
             const { data, error } = await supabase
                 .from("Data Siswa 2026/2027")
-                .select("KELAS")
-                .neq("KELAS", null)
-                .order("KELAS")
-                .limit(100);
+                .select(`"KELAS"`)
+                .not("KELAS", "is", null)
+                .order("KELAS");
 
-            if (error) return console.error("Gagal ambil kelas:", error);
+            if (error) {
+                console.error("Gagal ambil kelas:", error);
+                alert("Tidak bisa memuat daftar kelas: " + error.message);
+                return;
+            }
             
-            const unik = [...new Set(data.map(item => item.KELAS))];
+            const daftarKelas = [...new Set(data.map(item => item.KELAS))].filter(k => k);
             const pilih = document.getElementById("kelas");
-            unik.forEach(kelas => {
+            pilih.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+            daftarKelas.forEach(kelas => {
                 const opsi = document.createElement("option");
                 opsi.value = kelas;
                 opsi.textContent = kelas;
@@ -99,12 +102,18 @@
 
             const { data, error } = await supabase
                 .from("Data Siswa 2026/2027")
-                .select("NAMA SISWA")
+                .select(`"NAMA SISWA"`)
                 .eq("KELAS", kelas)
                 .order("NAMA SISWA");
 
-            if (error) return alert("Gagal memuat siswa: " + error.message);
-            if (!data.length) return alert("Tidak ada siswa di kelas ini!");
+            if (error) {
+                alert("Gagal memuat siswa: " + error.message);
+                return;
+            }
+            if (!data.length) {
+                alert("Tidak ada siswa di kelas ini!");
+                return;
+            }
 
             const tabel = document.getElementById("daftarSiswa");
             tabel.innerHTML = "";
@@ -159,7 +168,7 @@
                     kelas: kelas,
                     nama_siswa: nama,
                     status: status,
-                    email_pengisi: "guru@sekolah.sch.id" // bisa diganti nanti
+                    email_pengisi: "guru@sekolah.sch.id"
                 });
             });
 
