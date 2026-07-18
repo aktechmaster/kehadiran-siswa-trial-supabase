@@ -3,222 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Kehadiran Siswa</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-4 md:p-6">
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">📋 Jurnal Kehadiran Siswa</h1>
+    <title>Jurnal Perilaku & Sikap Siswa - SMP IT Al-Kautsar</title>
+    <link rel="icon" type="image/png" href="logosmpit.png">
+    <link rel="shortcut icon" type="image/png" href="logosmpit.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0284c7;      /* Biru Utama (Sky 600) */
+            --accent: #06b6d4;       /* Cyan Cerah (Cyan 500) */
+            --bg-page: #f0f9ff;      /* Background Halaman (Very Light Blue) */
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-main: #334155;    /* Teks Abu Gelap */
+            --text-light: #64748b;   /* Teks Keterangan */
+            --input-bg: #ffffff;
+            --shadow: 0 10px 40px -10px rgba(2, 132, 199, 0.2);
+            --danger: #ef4444;       /* Merah untuk Pelanggaran */
+            --success: #22c55e;      /* Hijau untuk Tindakan Terpuji */
+        }
 
-        <!-- Form Pilihan -->
-        <div class="grid md:grid-cols-2 gap-4 mb-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                <input type="date" id="tanggal" class="w-full border rounded p-2" required>
+        * { box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-page);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.15) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header-logo {
+            width: 90px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 5px 15px rgba(2, 132, 199, 0.2));
+            transition: transform 0.3s;
+        }
+        
+        .header-logo:hover { transform: scale(1.05); }
+
+        .header h2 {
+            font-size: 1.6rem;
+            margin: 0;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* INPUT STYLING */
+        .input-group { margin-bottom: 20px; position: relative; }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--input-bg);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        }
+
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: var(--primary); z-index: 2;
+        }
+        .input-wrapper input { padding-left: 45px; }
+
+        /* JURNAL TYPE SELECTOR GRID */
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .type-item input { display: none; }
+        .type-item label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            color: var(--text-light);
+            gap: 8px;
+        }
+        .type-item label i { font-size: 1.5rem; }
+        .type-item label:hover { border-color: var(--primary); color: var(--primary); }
+
+        #type-terpuji:checked + label {
+            background: linear-gradient(135deg, var(--success), #4ade80);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+        #type-pelanggaran:checked + label {
+            background: linear-gradient(135deg, var(--danger), #f87171);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* SECTION DYNAMIC ANIMATION */
+        .dynamic-section {
+            display: none;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 20px;
+            margin-top: 25px;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* BUTTON SUBMIT */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.5);
+        }
+
+        .footer-credit {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .footer-credit span { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <!-- Gantilah src logo ke file logo SMP IT Al-Kautsar Anda -->
+        <img src="logosmpit.png" alt="Logo SMP IT Al-Kautsar" class="header-logo" onerror="this.style.display='none'">
+        <h2>SIAKAD AL-KAUTSAR</h2>
+        <p>Jurnal Perilaku & Sikap Siswa</p>
+    </div>
+
+    <form id="jurnalForm">
+        <!-- DATA UTAMA -->
+        <div class="input-group">
+            <label>Nama Guru Penginput</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-user-tie"></i>
+                <input type="text" class="form-control" placeholder="Masukkan nama Anda" required>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kelas</label>
-                <select id="kelas" class="w-full border rounded p-2" required>
-                    <option value="">-- Memuat daftar kelas... --</option>
+        </div>
+
+        <div class="input-group">
+            <label>Tanggal Kejadian</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-days"></i>
+                <input type="date" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Pilih Kelas</label>
+            <select class="form-control" id="kelasSelect" required>
+                <option value="" disabled selected>-- Pilih Kelas --</option>
+                <option value="7A">Kelas 7A</option>
+                <option value="7B">Kelas 7B</option>
+                <option value="8A">Kelas 8A</option>
+                <option value="8B">Kelas 8B</option>
+                <option value="9A">Kelas 9A</option>
+                <option value="9B">Kelas 9B</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Nama Siswa</label>
+            <select class="form-control" id="siswaSelect" required>
+                <option value="" disabled selected>-- Pilih Siswa --</option>
+                <!-- Nama siswa bisa di-load dinamis berdasarkan kelas -->
+                <option value="Siswa 1">Ahmad Zaki</option>
+                <option value="Siswa 2">Fatima Azzahra</option>
+                <option value="Siswa 3">Muhammad Rayhan</option>
+            </select>
+        </div>
+
+        <!-- PILIHAN UTAMA: TERPUJI / PELANGGARAN -->
+        <div class="input-group">
+            <label>Kategori Jurnal Perilaku</label>
+            <div class="type-grid">
+                <div class="type-item">
+                    <input type="radio" name="kategori_utama" id="type-terpuji" value="terpuji" onclick="switchSection('terpuji')">
+                    <label for="type-terpuji">
+                        <i class="fa-solid fa-star"></i>
+                        Tindakan Terpuji
+                    </label>
+                </div>
+                <div class="type-item">
+                    <input type="radio" name="kategori_utama" id="type-pelanggaran" value="pelanggaran" onclick="switchSection('pelanggaran')">
+                    <label for="type-pelanggaran">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        Pelanggaran Disiplin
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION A: TINDAKAN TERPUJI (DILAPORKAN HANYA JIKA DIGUNAKAN) -->
+        <div id="section-terpuji" class="dynamic-section">
+            <div class="input-group">
+                <label>Kategori Tindakan Terpuji</label>
+                <select class="form-control" id="kat-terpuji" onchange="updateOpsiTindakan()">
+                    <option value="" disabled selected>-- Pilih Kategori --</option>
+                    <option value="A">A. Ibadah & Pembiasaan Islami</option>
+                    <option value="B">B. Kepedulian Sosial</option>
+                    <option value="C">C. Kebersihan & Kelestarian Lingkungan</option>
+                    <option value="D">D. Integritas & Kepemimpinan</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Detail Aksi / Tindakan</label>
+                <select class="form-control" id="opsi-terpuji" required>
+                    <option value="" disabled selected>-- Pilih Detail Tindakan --</option>
                 </select>
             </div>
         </div>
 
-        <!-- Tombol Muat Siswa -->
-        <button id="muatSiswa" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mb-6">
-            Tampilkan Daftar Siswa
-        </button>
-
-        <!-- Tabel Kehadiran -->
-        <div id="areaTabel" class="hidden">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Daftar Siswa & Kehadiran</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border p-2 text-left">No</th>
-                            <th class="border p-2 text-left">Nama Siswa</th>
-                            <th class="border p-2 text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="daftarSiswa"></tbody>
-                </table>
+        <!-- SECTION B: PELANGGARAN DISIPLIN (DILAPORKAN HANYA JIKA DIGUNAKAN) -->
+        <div id="section-pelanggaran" class="dynamic-section">
+            <div class="input-group">
+                <label>Kategori Pelanggaran Disiplin</label>
+                <select class="form-control" id="kat-pelanggaran" onchange="updateOpsiPelanggaran()">
+                    <option value="" disabled selected>-- Pilih Kategori Pelanggaran --</option>
+                    <option value="A">A. Keterlambatan</option>
+                    <option value="B">B. Kehadiran</option>
+                    <option value="C">C. Pakaian</option>
+                    <option value="D">D. Kepribadian</option>
+                    <option value="E">E. Ketertiban</option>
+                    <option value="F">F. Merokok</option>
+                    <option value="G">G. Pornografi</option>
+                    <option value="H">H. Senjata</option>
+                    <option value="I">I. NAPZA</option>
+                    <option value="J">J. Berkelahi</option>
+                    <option value="K">K. Tindak Pidana Berat</option>
+                </select>
             </div>
-
-            <button id="simpanData" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mt-6">
-                💾 Simpan Kehadiran
-            </button>
-            <p id="pesan" class="mt-4 text-center font-medium"></p>
+            <div class="input-group">
+                <label>Detail Pelanggaran Tata Tertib</label>
+                <select class="form-control" id="opsi-pelanggaran" required>
+                    <option value="" disabled selected>-- Pilih Jenis Pelanggaran --</option>
+                </select>
+            </div>
         </div>
+
+        <!-- INPUT CATATAN / KETERANGAN TAMBAHAN -->
+        <div class="input-group">
+            <label>Deskripsi Kejadian / Catatan Tambahan</label>
+            <textarea class="form-control" rows="3" placeholder="Tulis rincian kronologi atau catatan di sini..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Simpan Jurnal Perilaku</button>
+    </form>
+
+    <div class="footer-credit">
+        &copy; 2026 SMP IT Al-Kautsar. Developed by <span>Smart Input System Team</span>.
     </div>
+</div>
 
-    <script>
-        // ==========================================
-        // 🔑 PASTIKAN GANTI KUNCI INI DENGAN MILIKMU
-        // ==========================================
-        const SUPABASE_URL = "https://vbqihpwsneymfrjzlkrw.supabase.co";
-        // GANTI bagian ini dengan kunci lengkap yang kamu salin tadi:
-        const SUPABASE_ANON_KEY = "sb_publishable_lIrrMLTWNuQ_g0t0BXogpQ_6x5Vt3lh"; 
-        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+    // Data Kamus untuk Instrumen Tindakan Terpuji
+    const dataTerpuji = {
+        'A': [
+            "Menjadi petugas sukarela di Masjid (Imam/Muadzin/Iqamah) [+10 Poin]",
+            "Merapikan fasilitas ibadah (Sajadah/Mukena/Shaf sandal) [+5 Poin]",
+            "Membantu ketertiban shaf dan kekhusyukan shalat jamaah [+5 Poin]",
+            "Budaya 5S spontan (Salam, Sapa, Senyum) kepada tamu/guru [+5 Poin]",
+            "Mengingatkan/mengajak teman dalam kebaikan secara santun [+5 Poin]"
+        ],
+        'B': [
+            "Solidaritas membantu teman yang sakit/terluka/tertimpa musibah [+10 Poin]",
+            "Tutor sebaya (Membantu mengajari teman kesulitan belajar) [+10 Poin]",
+            "Resolusi konflik (Melerai atau mendamaikan teman berselisih) [+15 Poin]",
+            "Sikap proaktif anti-bullying (Membela/melaporkan perundungan) [+20 Poin]",
+            "Berbagi/sedekah spontan (Meminjamkan alat tulis/makanan) [+5 Poin]"
+        ],
+        'C': [
+            "Piket sukarela (Membersihkan kelas/papan tulis di luar jadwal) [+10 Poin]",
+            "Aksi pungut sampah spontan di area sekolah tanpa diperintah [+5 Poin]",
+            "Penyelamat fasilitas sekolah (Matikan keran air/AC mubazir) [+5 Poin]",
+            "Menjaga kerapian barang bersama (Buku/alat olahraga) [+5 Poin]",
+            "Merawat tanaman atau lingkungan sekolah secara sukarela [+10 Poin]"
+        ],
+        'D': [
+            "Kejujuran tinggi (Mengembalikan uang/barang berharga ditemukan) [+25 Poin]",
+            "Mengakui kesalahan secara ksatria dan bertanggung jawab [+15 Poin]",
+            "Kepemimpinan positif (Mengkoordinir kelas/panitia dengan baik) [+15 Poin]",
+            "Kepatuhan tinggi / Menjadi role model (Kondisikan kelas jam kosong) [+10 Poin]"
+        ]
+    };
 
-        // ==========================================
-        // 📋 AMBIL DAFTAR KELAS DARI TABEL DATA SISWA
-        // ==========================================
-        async function ambilDaftarKelas() {
-            try {
-                const { data, error } = await supabase
-                    .from("Data Siswa 2026/2027")
-                    .select("KELAS") // Perbaiki cara baca kolom
-                    .not("KELAS", "is", null)
-                    .order("KELAS", { ascending: true });
+    // Data Kamus untuk Instrumen Pelanggaran (Sesuai Instrumen Anda)
+    const dataPelanggaran = {
+        'A': [
+            "Terlambat masuk sekolah lebih dari 5 menit [-5 Poin]",
+            "Terlambat masuk kelas lebih dari 10 menit [-10 Poin]",
+            "Terlambat masuk Masjid untuk shalat berjamaah [-5 s/d 10 Poin]"
+        ],
+        'B': [
+            "Tidak masuk sekolah dengan memberi keterangan palsu [-20 Poin]",
+            "Tidak masuk jam pelajaran tertentu [-10 Poin]",
+            "Keluar kelas dan tidak masuk kembali ke kelas [-15 Poin]",
+            "Meninggalkan sekolah tanpa izin [-25 Poin]",
+            "Tidak ikut upacara bendera [-10 Poin]",
+            "Tidak ikut Senam [-10 Poin]"
+        ],
+        'C': [
+            "Seragam tidak sesuai aturan [-5 Poin]",
+            "Tidak memakai sepatu [-5 Poin]",
+            "Tidak memakai dasi dan topi saat upacara [-5 Poin]",
+            "Jilbab tidak standar [-5 Poin]",
+            "Menggunakan kaos kaki pendek (Banat) [-5 Poin]",
+            "Tidak memakai anak jilbab/anak jilbab tidak sesuai [-5 Poin]",
+            "Seragam sengaja disobek/dicoret [-15 Poin]"
+        ],
+        'D': [
+            "Berhias berlebihan [-10 Poin]",
+            "Memakai gelang/Kalung/Anting bagi putra [-10 Poin]",
+            "Memakai perhiasan mewah (Banat) [-15 Poin]",
+            "Rambut tidak sesuai aturan sekolah [-5 Poin]",
+            "Kuku panjang [-5 Poin]",
+            "Berpacaran [-25 Poin]",
+            "Menggunakan tato pada tubuh [-50 Poin]",
+            "Melawan guru [-30 Poin]",
+            "Tidak mengikuti pelajaran dengan baik/tidur/ribut [-10 Poin]",
+            "Melakukan bullying pada teman [-50 Poin]",
+            "Melakukan tindakan tidak menyenangkan/mengganggu siswa lain [-20 Poin]",
+            "Menggunakan media sosial dengan tidak baik [-30 Poin]",
+            "Mencemarkan nama baik sekolah/guru/teman [-40 Poin]",
+            "Hamil/menikah [-100 Poin]"
+        ],
+        'E': [
+            "Mengotori/Mencoret dinding/meja/fasilitas sekolah [-15 Poin]",
+            "Merusak barang teman/guru/fasilitas sekolah [-25 Poin]",
+            "Mengambil barang teman/guru/sekolah tanpa izin [-50 Poin]",
+            "Membuang sampah sembarangan [-5 Poin]",
+            "Merusak tanaman dengan sengaja [-10 Poin]",
+            "Makan permen karet [-5 Poin]",
+            "Makan dan minum berdiri [-5 Poin]",
+            "Membawa HP tanpa izin sekolah [-15 Poin]",
+            "Membawa barang tidak sesuai ketentuan sekolah [-15 Poin]",
+            "Membawa kendaraan pribadi (motor/mobil) [-30 Poin]",
+            "Sengaja mengabaikan bunyi bel tanda masuk [-10 Poin]"
+        ],
+        'F': ["Membawa rokok ke sekolah [-20 Poin]", "Merokok di sekolah [-25 Poin]"],
+        'G': ["Memiliki/membawa media pornografi & kekerasan [-50 Poin]", "Memperjualbelikan konten pornografi & kekerasan [-100 Poin]"],
+        'H': ["Membawa senjata tajam/api/peledak ke sekolah [-100 Poin]", "Memperjualbelikan senjata tajam/api/peledak [-100 Poin]", "Menggunakan senjata tajam/api/peledak untuk mengancam [-100 Poin]"],
+        'I': ["Membawa NAPZA ke sekolah [-100 Poin]", "Mengonsumsi NAPZA di sekolah [-100 Poin]", "Mengonsumsi NAPZA di luar sekolah [-100 Poin]"],
+        'J': ["Indikasi berkelahi/tawuran dengan sekolah lain [-50 Poin]", "Indikasi berkelahi dengan sesama siswa SMP IT [-50 Poin]", "Berkelahi dengan sesama siswa SMP IT Al-Kautsar [-70 Poin]"],
+        'K': ["Tersangkut tindak pidana berat lainnya [-100 Poin]"]
+    };
 
-                if (error) {
-                    console.error("Error ambil kelas:", error);
-                    document.getElementById("kelas").innerHTML = `<option value="">❌ Gagal memuat kelas</option>`;
-                    return;
-                }
+    // Fungsi Pengalih Tampilan Konten (Switch Section)
+    function switchSection(type) {
+        const secTerpuji = document.getElementById('section-terpuji');
+        const secPelanggaran = document.getElementById('section-pelanggaran');
+        const optTerpuji = document.getElementById('opsi-terpuji');
+        const optPelanggaran = document.getElementById('opsi-pelanggaran');
 
-                // Hapus duplikat dan kosong
-                const daftarKelas = [...new Set(data.map(item => item.KELAS))].filter(k => k);
-                const pilih = document.getElementById("kelas");
-                pilih.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
-
-                if (daftarKelas.length === 0) {
-                    pilih.innerHTML = `<option value="">⚠️ Belum ada data kelas</option>`;
-                    return;
-                }
-
-                daftarKelas.forEach(kelas => {
-                    const opsi = document.createElement("option");
-                    opsi.value = kelas;
-                    opsi.textContent = kelas;
-                    pilih.appendChild(opsi);
-                });
-
-            } catch (err) {
-                console.error("Kesalahan:", err);
-            }
+        if(type === 'terpuji') {
+            secTerpuji.style.display = 'block';
+            secPelanggaran.style.display = 'none';
+            optTerpuji.setAttribute('required', 'true');
+            optPelanggaran.removeAttribute('required');
+        } else {
+            secTerpuji.style.display = 'none';
+            secPelanggaran.style.display = 'block';
+            optPelanggaran.setAttribute('required', 'true');
+            optTerpuji.removeAttribute('required');
         }
+    }
 
-        // ==========================================
-        // 👤 TAMPILKAN DAFTAR SISWA SESUAI KELAS
-        // ==========================================
-        document.getElementById("muatSiswa").addEventListener("click", async () => {
-            const kelas = document.getElementById("kelas").value.trim();
-            const tanggal = document.getElementById("tanggal").value.trim();
-
-            if (!tanggal || !kelas) {
-                alert("⚠️ Isi tanggal dan pilih kelas terlebih dahulu!");
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase
-                    .from("Data Siswa 2026/2027")
-                    .select("NAMA SISWA")
-                    .eq("KELAS", kelas)
-                    .order("NAMA SISWA", { ascending: true });
-
-                if (error) {
-                    alert("❌ Gagal memuat siswa: " + error.message);
-                    return;
-                }
-
-                if (!data || data.length === 0) {
-                    alert("ℹ️ Tidak ada siswa terdaftar di kelas ini");
-                    return;
-                }
-
-                const tabel = document.getElementById("daftarSiswa");
-                tabel.innerHTML = "";
-
-                data.forEach((siswa, i) => {
-                    const baris = document.createElement("tr");
-                    baris.className = "hover:bg-gray-50";
-                    baris.innerHTML = `
-                        <td class="border p-2 text-center">${i + 1}</td>
-                        <td class="border p-2">${siswa["NAMA SISWA"]}</td>
-                        <td class="border p-2 text-center">
-                            <div class="flex justify-center gap-2 flex-wrap">
-                                <label class="cursor-pointer px-2 py-1 rounded bg-green-100 hover:bg-green-200">
-                                    <input type="radio" name="status_${i}" value="H" checked> H
-                                </label>
-                                <label class="cursor-pointer px-2 py-1 rounded bg-yellow-100 hover:bg-yellow-200">
-                                    <input type="radio" name="status_${i}" value="S"> S
-                                </label>
-                                <label class="cursor-pointer px-2 py-1 rounded bg-blue-100 hover:bg-blue-200">
-                                    <input type="radio" name="status_${i}" value="I"> I
-                                </label>
-                                <label class="cursor-pointer px-2 py-1 rounded bg-red-100 hover:bg-red-200">
-                                    <input type="radio" name="status_${i}" value="A"> A
-                                </label>
-                                <input type="hidden" class="nama_siswa" value="${siswa["NAMA SISWA"]}">
-                            </div>
-                        </td>
-                    `;
-                    tabel.appendChild(baris);
-                });
-
-                document.getElementById("areaTabel").classList.remove("hidden");
-
-            } catch (err) {
-                alert("❌ Terjadi kesalahan: " + err.message);
-            }
-        });
-
-        // ==========================================
-        // 💾 SIMPAN DATA KEHADIRAN KE SUPABASE
-        // ==========================================
-        document.getElementById("simpanData").addEventListener("click", async () => {
-            const tanggal = document.getElementById("tanggal").value;
-            const kelas = document.getElementById("kelas").value;
-            const pesan = document.getElementById("pesan");
-            pesan.textContent = "";
-            pesan.className = "mt-4 text-center font-medium";
-
-            const baris = document.querySelectorAll("#daftarSiswa tr");
-            const dataMasuk = [];
-
-            baris.forEach(brs => {
-                const nama = brs.querySelector(".nama_siswa").value;
-                const status = brs.querySelector("input[type=radio]:checked").value;
-                dataMasuk.push({
-                    tanggal: tanggal,
-                    kelas: kelas,
-                    nama_siswa: nama,
-                    status: status,
-                    email_pengisi: "guru@sekolah.sch.id"
-                });
+    // Update Dropdown Detail Tindakan Terpuji
+    function updateOpsiTindakan() {
+        const kat = document.getElementById('kat-terpuji').value;
+        const opt = document.getElementById('opsi-terpuji');
+        opt.innerHTML = '<option value="" disabled selected>-- Pilih Detail Tindakan --</option>';
+        
+        if(dataTerpuji[kat]) {
+            dataTerpuji[kat].forEach(item => {
+                let el = document.createElement('option');
+                el.value = item;
+                el.textContent = item;
+                opt.appendChild(el);
             });
+        }
+    }
 
-            try {
-                const { error } = await supabase
-                    .from("presensi_mentah")
-                    .insert(dataMasuk);
-
-                if (error) {
-                    pesan.textContent = "❌ Gagal disimpan: " + error.message;
-                    pesan.classList.add("text-red-600");
-                    console.error("Error simpan:", error);
-                } else {
-                    pesan.textContent = "✅ Berhasil disimpan! Rekap otomatis terbarui.";
-                    pesan.classList.add("text-green-600");
-                    // Reset form setelah simpan
-                    setTimeout(() => {
-                        document.getElementById("areaTabel").classList.add("hidden");
-                        document.getElementById("tanggal").value = "";
-                    }, 2000);
-                }
-
-            } catch (err) {
-                pesan.textContent = "❌ Kesalahan sistem: " + err.message;
-                pesan.classList.add("text-red-600");
-            }
-        });
-
-        // Jalankan saat halaman dibuka
-        window.addEventListener("load", ambilDaftarKelas);
-    </script>
+    // Update Dropdown Detail Pelanggaran
+    function updateOpsiPelanggaran() {
+        const kat = document.getElementById('kat-pelanggaran').value;
+        const opt = document.getElementById('opsi-pelanggaran');
+        opt.innerHTML = '<option value="" disabled selected>-- Pilih Jenis Pelanggaran --</option>';
+        
+        if(dataPelanggaran[kat]) {
+            dataPelanggaran[kat].forEach(item => {
+                let el = document.createElement('option');
+                el.value = item;
+                el.textContent = item;
+                opt.appendChild(el);
+            });
+        }
+    }
+</script>
 </body>
 </html>
