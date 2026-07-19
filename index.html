@@ -150,12 +150,12 @@
         }
         .input-wrapper input { padding-left: 45px; }
 
-        /* JURNAL TYPE SELECTOR GRID */
+        /* JURNAL TYPE SELECTOR GRID (Kategori Utama) */
         .type-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 25px;
+            margin-top: 5px;
         }
         .type-item input { display: none; }
         .type-item label {
@@ -172,10 +172,12 @@
             transition: all 0.3s;
             color: var(--text-light);
             gap: 8px;
+            text-align: center;
         }
         .type-item label i { font-size: 1.5rem; }
         .type-item label:hover { border-color: var(--primary); color: var(--primary); }
 
+        /* Efek saat Kategori dipilih */
         #type-terpuji:checked + label {
             background: linear-gradient(135deg, var(--success), #4ade80);
             color: white;
@@ -238,65 +240,86 @@
 
 <div class="container">
     <div class="header">
-        <!-- Gantilah src logo ke file logo SMP IT Al-Kautsar Anda -->
         <img src="logosmpit.png" alt="Logo SMP IT Al-Kautsar" class="header-logo" onerror="this.style.display='none'">
         <h2>SIAKAD AL-KAUTSAR</h2>
         <p>Jurnal Perilaku & Sikap Siswa</p>
     </div>
 
     <form id="jurnalForm">
-    <!-- NAMA GURU (SEKARANG DROPDOWN DINAMIS) -->
-    <div class="input-group">
-        <label>Nama Guru Penginput</label>
-        <select class="form-control" id="guruSelect" name="nama_guru" required>
-            <option value="" disabled selected>Memuat daftar guru...</option>
-        </select>
-    </div>
-
-    <div class="input-group">
-        <label>Tanggal Kejadian</label>
-        <div class="input-wrapper">
-            <i class="fa-solid fa-calendar-days"></i>
-            <input type="date" class="form-control" name="tanggal_kejadian" required>
+        <!-- NAMA GURU -->
+        <div class="input-group">
+            <label>Nama Guru Penginput</label>
+            <select class="form-control" id="guruSelect" name="nama_guru" required>
+                <option value="" disabled selected>Memuat daftar guru...</option>
+            </select>
         </div>
-    </div>
 
-    <!-- PILIH KELAS -->
-    <div class="input-group">
-        <label>Pilih Kelas</label>
-        <select class="form-control" id="kelasSelect" name="kelas" onchange="filterSiswa()" required>
-            <option value="" disabled selected>-- Pilih Kelas --</option>
-        </select>
-    </div>
+        <!-- TANGGAL KEJADIAN -->
+        <div class="input-group">
+            <label>Tanggal Kejadian</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-days"></i>
+                <input type="date" class="form-control" name="tanggal_kejadian" required>
+            </div>
+        </div>
 
-    <!-- NAMA SISWA (OTOMATIS TERFILTER BERDASARKAN KELAS) -->
-    <div class="input-group">
-        <label>Nama Siswa</label>
-        <select class="form-control" id="siswaSelect" name="nama_siswa" required>
-            <option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>
-        </select>
-    </div>
+        <!-- PILIH KELAS -->
+        <div class="input-group">
+            <label>Pilih Kelas</label>
+            <select class="form-control" id="kelasSelect" name="kelas" onchange="filterSiswa()" required>
+                <option value="" disabled selected>-- Pilih Kelas --</option>
+            </select>
+        </div>
+
+        <!-- NAMA SISWA -->
+        <div class="input-group">
+            <label>Nama Siswa</label>
+            <select class="form-control" id="siswaSelect" name="nama_siswa" required>
+                <option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>
+            </select>
+        </div>
+
+        <!-- KATEGORI JURNAL (INI YANG SEBELUMNYA HILANG) -->
+        <div class="input-group" style="margin-top: 30px;">
+            <label>Kategori Jurnal Perilaku</label>
+            <div class="type-grid">
+                <div class="type-item">
+                    <input type="radio" id="type-terpuji" name="kategori_utama" value="Tindakan Terpuji" onchange="switchSection('terpuji')" required>
+                    <label for="type-terpuji">
+                        <i class="fa-solid fa-star" style="color: #f59e0b;"></i>
+                        Tindakan Terpuji
+                    </label>
+                </div>
+                <div class="type-item">
+                    <input type="radio" id="type-pelanggaran" name="kategori_utama" value="Pelanggaran Disiplin" onchange="switchSection('pelanggaran')" required>
+                    <label for="type-pelanggaran">
+                        <i class="fa-solid fa-circle-exclamation" style="color: #ef4444;"></i>
+                        Pelanggaran
+                    </label>
+                </div>
+            </div>
+        </div>
 
         <!-- SECTION TINDAKAN TERPUJI -->
-    <div id="section-terpuji" class="input-group" style="display: none; margin-top: 20px;">
-        <label>Pilih Jenis Tindakan Terpuji</label>
-        <select class="form-control" id="select-terpuji">
-            <option value="" disabled selected>Memuat data apresiasi...</option>
-        </select>
-    </div>
+        <div id="section-terpuji" class="dynamic-section">
+            <label>Pilih Jenis Tindakan Terpuji</label>
+            <select class="form-control" id="select-terpuji">
+                <option value="" disabled selected>Memuat data apresiasi...</option>
+            </select>
+        </div>
 
-    <!-- SECTION PELANGGARAN DISIPLIN -->
-    <div id="section-pelanggaran" class="input-group" style="display: none; margin-top: 20px;">
-        <label>Pilih Jenis Pelanggaran</label>
-        <select class="form-control" id="select-pelanggaran">
-            <option value="" disabled selected>Memuat data pelanggaran...</option>
-        </select>
-    </div>
+        <!-- SECTION PELANGGARAN DISIPLIN -->
+        <div id="section-pelanggaran" class="dynamic-section">
+            <label>Pilih Jenis Pelanggaran</label>
+            <select class="form-control" id="select-pelanggaran">
+                <option value="" disabled selected>Memuat data pelanggaran...</option>
+            </select>
+        </div>
 
         <!-- INPUT CATATAN / KETERANGAN TAMBAHAN -->
-        <div class="input-group">
+        <div class="input-group" style="margin-top: 25px;">
             <label>Deskripsi Kejadian / Catatan Tambahan</label>
-            <textarea class="form-control" rows="3" placeholder="Tulis rincian kronologi atau catatan di sini..."></textarea>
+            <textarea class="form-control" name="catatan" rows="3" placeholder="Tulis rincian kronologi atau catatan di sini..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit">Simpan Jurnal Perilaku</button>
@@ -308,16 +331,16 @@
 </div>
 
 <script>
-    // Paste URL Deployment Google Apps Script Anda di sini
+    // URL Web App GAS Anda
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxHBqzCq6DlLM6yX-hk9tL1kX-ZgXL8cLFkq3gSpGwaD2lkZP6LuCFGOH2WpcLQXm9a7A/exec";
     let databaseSiswa = {};
 
-    // Ambil Data Master saat Halaman Pertama kali dibuka
+    // 1. Ambil Data Master saat Halaman Pertama kali dibuka
     window.addEventListener('DOMContentLoaded', () => {
         fetch(WEB_APP_URL)
             .then(res => res.json())
             .then(data => {
-                // 1. Isi Dropdown Guru
+                // Isi Dropdown Guru
                 const guruSelect = document.getElementById('guruSelect');
                 guruSelect.innerHTML = '<option value="" disabled selected>-- Pilih Nama Anda --</option>';
                 data.guru.forEach(nama => {
@@ -326,7 +349,7 @@
                     guruSelect.appendChild(opt);
                 });
 
-                // 2. Simpan Data Siswa ke Memory & Isi Dropdown Kelas
+                // Simpan Data Siswa ke Memory & Isi Dropdown Kelas
                 databaseSiswa = data.siswa;
                 const kelasSelect = document.getElementById('kelasSelect');
                 kelasSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kelas --</option>';
@@ -336,7 +359,7 @@
                     kelasSelect.appendChild(opt);
                 });
 
-                // 3. Isi Dropdown Tindakan Terpuji (Apresiasi) secara Otomatis
+                // Isi Dropdown Tindakan Terpuji dari Spreadsheet
                 const selectTerpuji = document.getElementById('select-terpuji');
                 selectTerpuji.innerHTML = '<option value="" disabled selected>-- Pilih Tindakan Terpuji --</option>';
                 data.apresiasi.forEach(item => {
@@ -345,7 +368,7 @@
                     selectTerpuji.appendChild(opt);
                 });
 
-                // 4. Isi Dropdown Pelanggaran secara Otomatis
+                // Isi Dropdown Pelanggaran dari Spreadsheet
                 const selectPelanggaran = document.getElementById('select-pelanggaran');
                 selectPelanggaran.innerHTML = '<option value="" disabled selected>-- Pilih Pelanggaran --</option>';
                 data.pelanggaran.forEach(item => {
@@ -357,7 +380,7 @@
             .catch(err => alert("Gagal memuat database master sekolah. Periksa koneksi internet."));
     });
 
-    // Fungsi memfilter siswa secara otomatis ketika kelas dipilih
+    // 2. Fungsi memfilter siswa secara otomatis ketika kelas dipilih
     function filterSiswa() {
         const kelasDipilih = document.getElementById('kelasSelect').value;
         const siswaSelect = document.getElementById('siswaSelect');
@@ -372,57 +395,73 @@
         }
     }
 
-    // Fungsi Pengalih Tampilan Konten (Switch Section)
+    // 3. Fungsi Pengalih Tampilan Konten (Switch Section) - SUDAH DIPERBAIKI
     function switchSection(type) {
         const secTerpuji = document.getElementById('section-terpuji');
         const secPelanggaran = document.getElementById('section-pelanggaran');
-        const optTerpuji = document.getElementById('opsi-terpuji');
-        const optPelanggaran = document.getElementById('opsi-pelanggaran');
+        const selectTerpuji = document.getElementById('select-terpuji');
+        const selectPelanggaran = document.getElementById('select-pelanggaran');
 
         if(type === 'terpuji') {
             secTerpuji.style.display = 'block';
             secPelanggaran.style.display = 'none';
-            optTerpuji.setAttribute('required', 'true');
-            optPelanggaran.removeAttribute('required');
+            
+            // Atur atribut name agar dikirim ke spreadsheet, dan wajib diisi
+            selectTerpuji.setAttribute('name', 'detail_perilaku');
+            selectTerpuji.setAttribute('required', 'true');
+            
+            // Hapus atribut dari form yang disembunyikan
+            selectPelanggaran.removeAttribute('name');
+            selectPelanggaran.removeAttribute('required');
         } else {
             secTerpuji.style.display = 'none';
             secPelanggaran.style.display = 'block';
-            optPelanggaran.setAttribute('required', 'true');
-            optTerpuji.removeAttribute('required');
+            
+            // Atur atribut name agar dikirim ke spreadsheet, dan wajib diisi
+            selectPelanggaran.setAttribute('name', 'detail_perilaku');
+            selectPelanggaran.setAttribute('required', 'true');
+            
+            // Hapus atribut dari form yang disembunyikan
+            selectTerpuji.removeAttribute('name');
+            selectTerpuji.removeAttribute('required');
         }
     }
 
-    // Update Dropdown Detail Tindakan Terpuji
-    function updateOpsiTindakan() {
-        const kat = document.getElementById('kat-terpuji').value;
-        const opt = document.getElementById('opsi-terpuji');
-        opt.innerHTML = '<option value="" disabled selected>-- Pilih Detail Tindakan --</option>';
+    // 4. Fungsi Submit Data Tanpa Refresh (Mencegah Error CORS saat Submit)
+    document.getElementById('jurnalForm').addEventListener('submit', function(e) {
+        e.preventDefault(); 
         
-        if(dataTerpuji[kat]) {
-            dataTerpuji[kat].forEach(item => {
-                let el = document.createElement('option');
-                el.value = item;
-                el.textContent = item;
-                opt.appendChild(el);
-            });
-        }
-    }
-
-    // Update Dropdown Detail Pelanggaran
-    function updateOpsiPelanggaran() {
-        const kat = document.getElementById('kat-pelanggaran').value;
-        const opt = document.getElementById('opsi-pelanggaran');
-        opt.innerHTML = '<option value="" disabled selected>-- Pilih Jenis Pelanggaran --</option>';
+        const btnSubmit = document.querySelector('.btn-submit');
+        const originalText = btnSubmit.innerHTML;
         
-        if(dataPelanggaran[kat]) {
-            dataPelanggaran[kat].forEach(item => {
-                let el = document.createElement('option');
-                el.value = item;
-                el.textContent = item;
-                opt.appendChild(el);
-            });
-        }
-    }
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = 'Menyimpan...';
+        
+        const formData = new URLSearchParams(new FormData(this));
+        
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+        })
+        .then(() => {
+            alert('Alhamdulillah! Data Jurnal berhasil disimpan ke database.');
+            this.reset();
+            
+            // Sembunyikan kembali dropdown pelanggaran/apresiasi setelah submit
+            document.getElementById('section-terpuji').style.display = 'none';
+            document.getElementById('section-pelanggaran').style.display = 'none';
+            document.getElementById('siswaSelect').innerHTML = '<option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>';
+            
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+        })
+        .catch(err => {
+            alert('Gagal menyimpan data. Periksa koneksi internet Anda.');
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+        });
+    });
 </script>
 </body>
 </html>
