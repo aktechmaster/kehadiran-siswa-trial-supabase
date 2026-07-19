@@ -244,68 +244,38 @@
         <p>Jurnal Perilaku & Sikap Siswa</p>
     </div>
 
-    <form id="jurnalForm">
-        <!-- DATA UTAMA -->
-        <div class="input-group">
-            <label>Nama Guru Penginput</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-user-tie"></i>
-                <input type="text" class="form-control" placeholder="Masukkan nama Anda" required>
-            </div>
-        </div>
+    <<form id="jurnalForm">
+    <!-- NAMA GURU (SEKARANG DROPDOWN DINAMIS) -->
+    <div class="input-group">
+        <label>Nama Guru Penginput</label>
+        <select class="form-control" id="guruSelect" name="nama_guru" required>
+            <option value="" disabled selected>Memuat daftar guru...</option>
+        </select>
+    </div>
 
-        <div class="input-group">
-            <label>Tanggal Kejadian</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-calendar-days"></i>
-                <input type="date" class="form-control" required>
-            </div>
+    <div class="input-group">
+        <label>Tanggal Kejadian</label>
+        <div class="input-wrapper">
+            <i class="fa-solid fa-calendar-days"></i>
+            <input type="date" class="form-control" name="tanggal_kejadian" required>
         </div>
+    </div>
 
-        <div class="input-group">
-            <label>Pilih Kelas</label>
-            <select class="form-control" id="kelasSelect" required>
-                <option value="" disabled selected>-- Pilih Kelas --</option>
-                <option value="7A">Kelas 7A</option>
-                <option value="7B">Kelas 7B</option>
-                <option value="8A">Kelas 8A</option>
-                <option value="8B">Kelas 8B</option>
-                <option value="9A">Kelas 9A</option>
-                <option value="9B">Kelas 9B</option>
-            </select>
-        </div>
+    <!-- PILIH KELAS -->
+    <div class="input-group">
+        <label>Pilih Kelas</label>
+        <select class="form-control" id="kelasSelect" name="kelas" onchange="filterSiswa()" required>
+            <option value="" disabled selected>-- Pilih Kelas --</option>
+        </select>
+    </div>
 
-        <div class="input-group">
-            <label>Nama Siswa</label>
-            <select class="form-control" id="siswaSelect" required>
-                <option value="" disabled selected>-- Pilih Siswa --</option>
-                <!-- Nama siswa bisa di-load dinamis berdasarkan kelas -->
-                <option value="Siswa 1">Ahmad Zaki</option>
-                <option value="Siswa 2">Fatima Azzahra</option>
-                <option value="Siswa 3">Muhammad Rayhan</option>
-            </select>
-        </div>
-
-        <!-- PILIHAN UTAMA: TERPUJI / PELANGGARAN -->
-        <div class="input-group">
-            <label>Kategori Jurnal Perilaku</label>
-            <div class="type-grid">
-                <div class="type-item">
-                    <input type="radio" name="kategori_utama" id="type-terpuji" value="terpuji" onclick="switchSection('terpuji')">
-                    <label for="type-terpuji">
-                        <i class="fa-solid fa-star"></i>
-                        Tindakan Terpuji
-                    </label>
-                </div>
-                <div class="type-item">
-                    <input type="radio" name="kategori_utama" id="type-pelanggaran" value="pelanggaran" onclick="switchSection('pelanggaran')">
-                    <label for="type-pelanggaran">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        Pelanggaran Disiplin
-                    </label>
-                </div>
-            </div>
-        </div>
+    <!-- NAMA SISWA (OTOMATIS TERFILTER BERDASARKAN KELAS) -->
+    <div class="input-group">
+        <label>Nama Siswa</label>
+        <select class="form-control" id="siswaSelect" name="nama_siswa" required>
+            <option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>
+        </select>
+    </div>
 
         <!-- SECTION A: TINDAKAN TERPUJI (DILAPORKAN HANYA JIKA DIGUNAKAN) -->
         <div id="section-terpuji" class="dynamic-section">
@@ -369,97 +339,51 @@
 </div>
 
 <script>
-    // Data Kamus untuk Instrumen Tindakan Terpuji
-    const dataTerpuji = {
-        'A': [
-            "Menjadi petugas sukarela di Masjid (Imam/Muadzin/Iqamah) [+10 Poin]",
-            "Merapikan fasilitas ibadah (Sajadah/Mukena/Shaf sandal) [+5 Poin]",
-            "Membantu ketertiban shaf dan kekhusyukan shalat jamaah [+5 Poin]",
-            "Budaya 5S spontan (Salam, Sapa, Senyum) kepada tamu/guru [+5 Poin]",
-            "Mengingatkan/mengajak teman dalam kebaikan secara santun [+5 Poin]"
-        ],
-        'B': [
-            "Solidaritas membantu teman yang sakit/terluka/tertimpa musibah [+10 Poin]",
-            "Tutor sebaya (Membantu mengajari teman kesulitan belajar) [+10 Poin]",
-            "Resolusi konflik (Melerai atau mendamaikan teman berselisih) [+15 Poin]",
-            "Sikap proaktif anti-bullying (Membela/melaporkan perundungan) [+20 Poin]",
-            "Berbagi/sedekah spontan (Meminjamkan alat tulis/makanan) [+5 Poin]"
-        ],
-        'C': [
-            "Piket sukarela (Membersihkan kelas/papan tulis di luar jadwal) [+10 Poin]",
-            "Aksi pungut sampah spontan di area sekolah tanpa diperintah [+5 Poin]",
-            "Penyelamat fasilitas sekolah (Matikan keran air/AC mubazir) [+5 Poin]",
-            "Menjaga kerapian barang bersama (Buku/alat olahraga) [+5 Poin]",
-            "Merawat tanaman atau lingkungan sekolah secara sukarela [+10 Poin]"
-        ],
-        'D': [
-            "Kejujuran tinggi (Mengembalikan uang/barang berharga ditemukan) [+25 Poin]",
-            "Mengakui kesalahan secara ksatria dan bertanggung jawab [+15 Poin]",
-            "Kepemimpinan positif (Mengkoordinir kelas/panitia dengan baik) [+15 Poin]",
-            "Kepatuhan tinggi / Menjadi role model (Kondisikan kelas jam kosong) [+10 Poin]"
-        ]
-    };
+    // Paste URL Deployment Google Apps Script Anda di sini
+    const WEB_APP_URL = "PASANG_URL_DEPLOYMENT_ANDA_DI_SINI";
+    let databaseSiswa = {};
 
-    // Data Kamus untuk Instrumen Pelanggaran (Sesuai Instrumen Anda)
-    const dataPelanggaran = {
-        'A': [
-            "Terlambat masuk sekolah lebih dari 5 menit [-5 Poin]",
-            "Terlambat masuk kelas lebih dari 10 menit [-10 Poin]",
-            "Terlambat masuk Masjid untuk shalat berjamaah [-5 s/d 10 Poin]"
-        ],
-        'B': [
-            "Tidak masuk sekolah dengan memberi keterangan palsu [-20 Poin]",
-            "Tidak masuk jam pelajaran tertentu [-10 Poin]",
-            "Keluar kelas dan tidak masuk kembali ke kelas [-15 Poin]",
-            "Meninggalkan sekolah tanpa izin [-25 Poin]",
-            "Tidak ikut upacara bendera [-10 Poin]",
-            "Tidak ikut Senam [-10 Poin]"
-        ],
-        'C': [
-            "Seragam tidak sesuai aturan [-5 Poin]",
-            "Tidak memakai sepatu [-5 Poin]",
-            "Tidak memakai dasi dan topi saat upacara [-5 Poin]",
-            "Jilbab tidak standar [-5 Poin]",
-            "Menggunakan kaos kaki pendek (Banat) [-5 Poin]",
-            "Tidak memakai anak jilbab/anak jilbab tidak sesuai [-5 Poin]",
-            "Seragam sengaja disobek/dicoret [-15 Poin]"
-        ],
-        'D': [
-            "Berhias berlebihan [-10 Poin]",
-            "Memakai gelang/Kalung/Anting bagi putra [-10 Poin]",
-            "Memakai perhiasan mewah (Banat) [-15 Poin]",
-            "Rambut tidak sesuai aturan sekolah [-5 Poin]",
-            "Kuku panjang [-5 Poin]",
-            "Berpacaran [-25 Poin]",
-            "Menggunakan tato pada tubuh [-50 Poin]",
-            "Melawan guru [-30 Poin]",
-            "Tidak mengikuti pelajaran dengan baik/tidur/ribut [-10 Poin]",
-            "Melakukan bullying pada teman [-50 Poin]",
-            "Melakukan tindakan tidak menyenangkan/mengganggu siswa lain [-20 Poin]",
-            "Menggunakan media sosial dengan tidak baik [-30 Poin]",
-            "Mencemarkan nama baik sekolah/guru/teman [-40 Poin]",
-            "Hamil/menikah [-100 Poin]"
-        ],
-        'E': [
-            "Mengotori/Mencoret dinding/meja/fasilitas sekolah [-15 Poin]",
-            "Merusak barang teman/guru/fasilitas sekolah [-25 Poin]",
-            "Mengambil barang teman/guru/sekolah tanpa izin [-50 Poin]",
-            "Membuang sampah sembarangan [-5 Poin]",
-            "Merusak tanaman dengan sengaja [-10 Poin]",
-            "Makan permen karet [-5 Poin]",
-            "Makan dan minum berdiri [-5 Poin]",
-            "Membawa HP tanpa izin sekolah [-15 Poin]",
-            "Membawa barang tidak sesuai ketentuan sekolah [-15 Poin]",
-            "Membawa kendaraan pribadi (motor/mobil) [-30 Poin]",
-            "Sengaja mengabaikan bunyi bel tanda masuk [-10 Poin]"
-        ],
-        'F': ["Membawa rokok ke sekolah [-20 Poin]", "Merokok di sekolah [-25 Poin]"],
-        'G': ["Memiliki/membawa media pornografi & kekerasan [-50 Poin]", "Memperjualbelikan konten pornografi & kekerasan [-100 Poin]"],
-        'H': ["Membawa senjata tajam/api/peledak ke sekolah [-100 Poin]", "Memperjualbelikan senjata tajam/api/peledak [-100 Poin]", "Menggunakan senjata tajam/api/peledak untuk mengancam [-100 Poin]"],
-        'I': ["Membawa NAPZA ke sekolah [-100 Poin]", "Mengonsumsi NAPZA di sekolah [-100 Poin]", "Mengonsumsi NAPZA di luar sekolah [-100 Poin]"],
-        'J': ["Indikasi berkelahi/tawuran dengan sekolah lain [-50 Poin]", "Indikasi berkelahi dengan sesama siswa SMP IT [-50 Poin]", "Berkelahi dengan sesama siswa SMP IT Al-Kautsar [-70 Poin]"],
-        'K': ["Tersangkut tindak pidana berat lainnya [-100 Poin]"]
-    };
+    // Ambil Data Master saat Halaman Pertama kali dibuka
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch(WEB_APP_URL)
+            .then(res => res.json())
+            .then(data => {
+                // 1. Isi Dropdown Guru
+                const guruSelect = document.getElementById('guruSelect');
+                guruSelect.innerHTML = '<option value="" disabled selected>-- Pilih Nama Anda --</option>';
+                data.guru.forEach(nama => {
+                    let opt = document.createElement('option');
+                    opt.value = nama; opt.textContent = nama;
+                    guruSelect.appendChild(opt);
+                });
+
+                // 2. Simpan Data Siswa ke Memory & Isi Dropdown Kelas
+                databaseSiswa = data.siswa;
+                const kelasSelect = document.getElementById('kelasSelect');
+                kelasSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kelas --</option>';
+                Object.keys(databaseSiswa).sort().forEach(kelas => {
+                    let opt = document.createElement('option');
+                    opt.value = kelas; opt.textContent = "Kelas " + kelas;
+                    kelasSelect.appendChild(opt);
+                });
+            })
+            .catch(err => alert("Gagal memuat database master sekolah. Periksa koneksi internet."));
+    });
+
+    // Fungsi memfilter siswa secara otomatis ketika kelas dipilih
+    function filterSiswa() {
+        const kelasDipilih = document.getElementById('kelasSelect').value;
+        const siswaSelect = document.getElementById('siswaSelect');
+        siswaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Nama Siswa --</option>';
+
+        if(databaseSiswa[kelasDipilih]) {
+            databaseSiswa[kelasDipilih].sort().forEach(nama => {
+                let opt = document.createElement('option');
+                opt.value = nama; opt.textContent = nama;
+                siswaSelect.appendChild(opt);
+            });
+        }
+    }
 
     // Fungsi Pengalih Tampilan Konten (Switch Section)
     function switchSection(type) {
