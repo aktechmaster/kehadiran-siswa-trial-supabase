@@ -277,52 +277,21 @@
         </select>
     </div>
 
-        <!-- SECTION A: TINDAKAN TERPUJI (DILAPORKAN HANYA JIKA DIGUNAKAN) -->
-        <div id="section-terpuji" class="dynamic-section">
-            <div class="input-group">
-                <label>Kategori Tindakan Terpuji</label>
-                <select class="form-control" id="kat-terpuji" onchange="updateOpsiTindakan()">
-                    <option value="" disabled selected>-- Pilih Kategori --</option>
-                    <option value="A">A. Ibadah & Pembiasaan Islami</option>
-                    <option value="B">B. Kepedulian Sosial</option>
-                    <option value="C">C. Kebersihan & Kelestarian Lingkungan</option>
-                    <option value="D">D. Integritas & Kepemimpinan</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Detail Aksi / Tindakan</label>
-                <select class="form-control" id="opsi-terpuji" required>
-                    <option value="" disabled selected>-- Pilih Detail Tindakan --</option>
-                </select>
-            </div>
-        </div>
+        <!-- SECTION TINDAKAN TERPUJI -->
+    <div id="section-terpuji" class="input-group" style="display: none; margin-top: 20px;">
+        <label>Pilih Jenis Tindakan Terpuji</label>
+        <select class="form-control" id="select-terpuji">
+            <option value="" disabled selected>Memuat data apresiasi...</option>
+        </select>
+    </div>
 
-        <!-- SECTION B: PELANGGARAN DISIPLIN (DILAPORKAN HANYA JIKA DIGUNAKAN) -->
-        <div id="section-pelanggaran" class="dynamic-section">
-            <div class="input-group">
-                <label>Kategori Pelanggaran Disiplin</label>
-                <select class="form-control" id="kat-pelanggaran" onchange="updateOpsiPelanggaran()">
-                    <option value="" disabled selected>-- Pilih Kategori Pelanggaran --</option>
-                    <option value="A">A. Keterlambatan</option>
-                    <option value="B">B. Kehadiran</option>
-                    <option value="C">C. Pakaian</option>
-                    <option value="D">D. Kepribadian</option>
-                    <option value="E">E. Ketertiban</option>
-                    <option value="F">F. Merokok</option>
-                    <option value="G">G. Pornografi</option>
-                    <option value="H">H. Senjata</option>
-                    <option value="I">I. NAPZA</option>
-                    <option value="J">J. Berkelahi</option>
-                    <option value="K">K. Tindak Pidana Berat</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Detail Pelanggaran Tata Tertib</label>
-                <select class="form-control" id="opsi-pelanggaran" required>
-                    <option value="" disabled selected>-- Pilih Jenis Pelanggaran --</option>
-                </select>
-            </div>
-        </div>
+    <!-- SECTION PELANGGARAN DISIPLIN -->
+    <div id="section-pelanggaran" class="input-group" style="display: none; margin-top: 20px;">
+        <label>Pilih Jenis Pelanggaran</label>
+        <select class="form-control" id="select-pelanggaran">
+            <option value="" disabled selected>Memuat data pelanggaran...</option>
+        </select>
+    </div>
 
         <!-- INPUT CATATAN / KETERANGAN TAMBAHAN -->
         <div class="input-group">
@@ -365,6 +334,24 @@
                     let opt = document.createElement('option');
                     opt.value = kelas; opt.textContent = "Kelas " + kelas;
                     kelasSelect.appendChild(opt);
+                });
+
+                // 3. Isi Dropdown Tindakan Terpuji (Apresiasi) secara Otomatis
+                const selectTerpuji = document.getElementById('select-terpuji');
+                selectTerpuji.innerHTML = '<option value="" disabled selected>-- Pilih Tindakan Terpuji --</option>';
+                data.apresiasi.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item; opt.textContent = item;
+                    selectTerpuji.appendChild(opt);
+                });
+
+                // 4. Isi Dropdown Pelanggaran secara Otomatis
+                const selectPelanggaran = document.getElementById('select-pelanggaran');
+                selectPelanggaran.innerHTML = '<option value="" disabled selected>-- Pilih Pelanggaran --</option>';
+                data.pelanggaran.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item; opt.textContent = item;
+                    selectPelanggaran.appendChild(opt);
                 });
             })
             .catch(err => alert("Gagal memuat database master sekolah. Periksa koneksi internet."));
